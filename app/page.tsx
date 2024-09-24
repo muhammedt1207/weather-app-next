@@ -14,13 +14,15 @@ interface WeatherData {
 
 function getCurrentDate(): string {
   const currentDate = new Date();
-  const options = { month: "long" };
+  const options: Intl.DateTimeFormatOptions = { month: "long" };
   const monthName = currentDate.toLocaleString("en-US", options);
-  const date = new Date().getDate() + ", " + monthName;
+  const date = `${currentDate.getDate()}, ${monthName}`;
   return date;
 }
 
+
 const Home = () => {
+  
   const date = getCurrentDate();
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
   const [city, setCity] = useState<string>("lahore");
@@ -30,7 +32,7 @@ const Home = () => {
       const response = await fetch(
         "http://localhost:3000/api/weather?address=" + cityName
       );
-      const jsonData: WeatherData = (await response.json()).data;
+      const jsonData: WeatherData = (await response.json());
       setWeatherData(jsonData);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -42,7 +44,9 @@ const Home = () => {
       const response = await fetch(
         `http://localhost:3000/api/weather?lat=${latitude}&lon=${longitude}`
       );
-      const jsonData: WeatherData = (await response.json()).data;
+      
+      const jsonData: WeatherData = (await response.json());
+      console.log(jsonData,'result of weather data')
       setWeatherData(jsonData);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -51,6 +55,7 @@ const Home = () => {
 
   useEffect(() => {
     if ("geolocation" in navigator) {
+      
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
@@ -60,9 +65,17 @@ const Home = () => {
           console.error("Error getting geolocation:", error);
         }
       );
+    }else{
+      console.log('not geolocation in navigator');
+      
     }
+    console.log(weatherData,'[[[[')
   }, []);
 
+  useEffect(() => {
+    console.log(weatherData, 'Updated Weather Data');
+  }, [weatherData]);
+  
   return (
     <main className={styles.main}>
       <article className={styles.widget}>
